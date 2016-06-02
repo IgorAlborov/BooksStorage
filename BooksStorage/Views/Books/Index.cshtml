@@ -1,0 +1,112 @@
+﻿@model IEnumerable<BooksStorage.Models.Book>
+
+@{
+    ViewBag.Title = "Book Storage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<div id="MyChart"></div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ISBN)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BookTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BookAuthor.Author)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ISBN)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BookTitle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BookAuthor.Author)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id }) |
+            <a href="javascript:void(0);" class="chart-button" data-id="@item.Id">Chart</a>
+        </td>
+    </tr>
+}
+
+</table>
+
+<p>
+    @Html.ActionLink("Manage book authors", "Index", "BookAuthors")
+</p>
+<p>
+    Page builded at @DateTime.Now.ToLongTimeString() |
+    @Html.ActionLink("Clear cache", "IndexRemoveCache")
+</p>
+
+@section Scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', { packages: ['corechart', 'line'] });
+        google.charts.setOnLoadCallback(drawBackgroundColor);
+
+        function drawBackgroundColor(id) {
+            var options = {
+                hAxis: {
+                    title: 'Time'
+                },
+                vAxis: {
+                    title: 'Popularity'
+                },
+                backgroundColor: '#f1f8e9'
+            };
+            var chartBlock = document.getElementById('MyChart');
+            var chart = new google.visualization.LineChart(chartBlock);
+            if (typeof (id) === "undefined") {
+                var data = new google.visualization.DataTable([]);
+                chart.draw(data, options);
+            }
+            else {
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/charts/hits/' + id,
+                    content: 'json',
+                    beforeSend: function () {
+                        $.blockUI({ message: 'please wait' });
+                    },
+                    success: function (data, status, jqXHR) {
+                        var googleData = new google.visualization.DataTable(data);
+                        chart.draw(googleData, options);
+                    },
+                    error: function (jqXHR, status, errorThrown) {
+                        alert(jqXHR.responseJSON.Message);
+                    },
+                    complete: function () {
+                        $.unblockUI();
+                    }
+
+                })
+            }
+        }
+
+        $(document).ready(function () {
+            $('.chart-button').click(function () {
+                var id = $(this).data('id');
+                drawBackgroundColor(id);
+            })
+        })
+    </script>
+}

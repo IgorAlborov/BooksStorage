@@ -1,0 +1,78 @@
+﻿@model BooksStorage.Models.Book
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Book</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ISBN)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ISBN)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BookTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BookTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BookAuthor.Author)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BookAuthor.Author)
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <img src="@Url.Action("Dchart", new { id = Model.Id })" />
+</div>
+@*<div id="MyChart">
+
+</div>*@
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+@*@section Scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', { packages: ['corechart', 'line'] });
+        google.charts.setOnLoadCallback(drawBackgroundColor);
+
+        function drawBackgroundColor() {
+            var dataJson = '@Html.Raw(Model.GoogleChartData)'
+            var data = new google.visualization.DataTable(dataJson);
+
+            var options = {
+                hAxis: {
+                    title: 'Time'
+                },
+                vAxis: {
+                    title: 'Popularity'
+                },
+                backgroundColor: '#f1f8e9'
+            };
+
+            var chartBlock = document.getElementById('MyChart');
+            var chart = new google.visualization.LineChart(chartBlock);
+            chart.draw(data, options);
+
+        }
+    </script>
+}*@
